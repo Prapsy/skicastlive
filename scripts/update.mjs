@@ -34,9 +34,18 @@ async function weather() {
     past_days: '3', forecast_days: '7', temperature_unit: 'fahrenheit', precipitation_unit: 'inch',
     wind_speed_unit: 'mph', timezone: 'America/New_York',
   });
-  const r = await fetch('https://api.open-meteo.com/v1/forecast?' + qs, { signal: AbortSignal.timeout(60000) });
-  if (!r.ok) throw new Error('Open-Meteo HTTP ' + r.status);
-  const arr = [].concat(await r.json());
+  let arr, lastErr;
+  for (let attempt = 0; attempt < 4 && !arr; attempt++) {
+    try {
+      const r = await fetch('https://api.open-meteo.com/v1/forecast?' + qs, { signal: AbortSignal.timeout(60000) });
+      if (!r.ok) throw new Error('Open-Meteo HTTP ' + r.status);
+      arr = [].concat(await r.json());
+    } catch (e) {
+      lastErr = new Error(`${e.message} ${e.cause?.code ?? e.cause?.message ?? ''}`.trim());
+      await new Promise(z => setTimeout(z, 15000 * (attempt + 1)));
+    }
+  }
+  if (!arr) throw lastErr;
   const out = {};
   arr.forEach((w, i) => {
     const d = w.daily, today = w.current?.time?.slice(0, 10) ?? d.time[3];
