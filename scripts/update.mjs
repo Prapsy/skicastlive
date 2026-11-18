@@ -1,6 +1,7 @@
 // Data job: weather for every mountain + each resort's own lift report -> public/data/snapshot.json
 // Usage: node scripts/update.mjs [id ...]     SKI_CACHE=1 reads report pages from .cache/pages (parser development)
 import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { get as httpGet } from './lib/http.mjs';
 import { SOURCES as BASE } from './sources/config.mjs';
 const extra = async f => existsSync(new URL(`./sources/${f}`, import.meta.url)) ? (await import(`./sources/${f}`)).SOURCES : {};
@@ -35,14 +36,18 @@ async function weather() {
     wind_speed_unit: 'mph', timezone: 'America/New_York',
   });
   let arr, lastErr;
-  for (let attempt = 0; attempt < 4 && !arr; attempt++) {
+  const url = 'https://api.open-meteo.com/v1/forecast?' + qs;
+  for (let attempt = 0; attempt < 3 && !arr; attempt++) {
     try {
-      const r = await fetch('https://api.open-meteo.com/v1/forecast?' + qs, { signal: AbortSignal.timeout(60000) });
+      const r = await fetch(url, { signal: AbortSignal.timeout(60000) });
       if (!r.ok) throw new Error('Open-Meteo HTTP ' + r.status);
       arr = [].concat(await r.json());
     } catch (e) {
       lastErr = new Error(`${e.message} ${e.cause?.code ?? e.cause?.message ?? ''}`.trim());
-      await new Promise(z => setTimeout(z, 15000 * (attempt + 1)));
+      try { // second route: curl with a longer connect timeout (hosted runners sometimes time out connecting)
+        const out = execFileSync('curl', ['-fsS', '--connect-timeout', '40', '--max-time', '90', url], { encoding: 'utf8', maxBuffer: 64e6 });
+        arr = [].concat(JSON.parse(out));
+      } catch { await new Promise(z => setTimeout(z, 10000 * (attempt + 1))); }
     }
   }
   if (!arr) throw lastErr;
@@ -56,7 +61,7 @@ async function weather() {
     const ti = days.findIndex(x => x.date === today);
     const sum = xs => r1(xs.reduce((a, x) => a + x.snowIn, 0));
     out[mountains[i].id] = {
-      elevationFt: Math.round(midM(mountains[i]) / 0.3048), today,
+      elevationFt: Math.round(midM(mountains[i]) / 0.3048), today, updated: now.toISOString(),
       now: w.current ? { tempF: Math.round(w.current.temperature_2m), summary: WMO[w.current.weather_code] ?? '—', windMph: Math.round(w.current.wind_speed_10m) } : null,
       past72In: sum(days.slice(Math.max(0, ti - 3), ti)), // modelled snowfall, previous 3 days
       next24In: sum(days.slice(ti, ti + 1)), next72In: sum(days.slice(ti, ti + 3)), next7dIn: sum(days.slice(ti, ti + 7)),

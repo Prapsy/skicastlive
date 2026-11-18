@@ -8,7 +8,7 @@ import statesJson from './states.json';
 type LiftStatus = 'open' | 'closed' | 'hold' | 'scheduled';
 interface Lift { name: string; status: LiftStatus; osmId?: number }
 interface Day { date: string; snowIn: number; precipIn: number; hiF: number; loF: number; code: number; summary: string; windMph: number; gustMph: number }
-interface Weather { elevationFt: number; today: string; now: { tempF: number; summary: string; windMph: number } | null; past72In: number; next24In: number; next72In: number; next7dIn: number; days: Day[] }
+interface Weather { elevationFt: number; today: string; updated?: string; now: { tempF: number; summary: string; windMph: number } | null; past72In: number; next24In: number; next72In: number; next7dIn: number; days: Day[] }
 interface News { title: string; date?: string | null; excerpt?: string; url?: string }
 interface Mountain {
   id: string; name: string; state: string; lat: number; lon: number; baseFt: number; summitFt: number; url: string;
@@ -231,7 +231,7 @@ function snowBlock(m: Mountain) {
     ${resortSnowRow(m)}
     ${w.now ? `<p class="now">Now at ${w.elevationFt.toLocaleString()} ft: <b>${w.now.tempF}°F</b>, ${esc(w.now.summary.toLowerCase())}, wind ${w.now.windMph} mph</p>` : ''}
     <ul class="days">${days}</ul>
-    <p class="muted small">Snowfall and forecast are modelled for mid-mountain (${w.elevationFt.toLocaleString()} ft) by Open-Meteo, not measured by the resort.</p>
+    <p class="muted small">Snowfall and forecast are modelled for mid-mountain (${w.elevationFt.toLocaleString()} ft) by Open-Meteo, not measured by the resort.${w.updated && Date.now() - new Date(w.updated).getTime() > 3 * 36e5 ? ` Forecast last refreshed ${ago(w.updated)}.` : ''}</p>
   </section>`;
 }
 
