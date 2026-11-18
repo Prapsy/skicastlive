@@ -1,0 +1,692 @@
+[
+ {
+  "id": "stowe",
+  "name": "Stowe",
+  "state": "VT",
+  "lat": 44.5306,
+  "lon": -72.7879,
+  "baseFt": 1265,
+  "summitFt": 3625,
+  "url": "https://www.stowe.com"
+ },
+ {
+  "id": "smugglers-notch",
+  "name": "Smugglers' Notch",
+  "state": "VT",
+  "lat": 44.5741,
+  "lon": -72.7722,
+  "baseFt": 1030,
+  "summitFt": 3640,
+  "url": "https://www.smuggs.com"
+ },
+ {
+  "id": "jay-peak",
+  "name": "Jay Peak",
+  "state": "VT",
+  "lat": 44.9307,
+  "lon": -72.5119,
+  "baseFt": 1815,
+  "summitFt": 3968,
+  "url": "https://jaypeakresort.com"
+ },
+ {
+  "id": "burke",
+  "name": "Burke Mountain",
+  "state": "VT",
+  "lat": 44.5815,
+  "lon": -71.9044,
+  "baseFt": 1210,
+  "summitFt": 3267,
+  "url": "https://skiburke.com"
+ },
+ {
+  "id": "sugarbush",
+  "name": "Sugarbush",
+  "state": "VT",
+  "lat": 44.1532,
+  "lon": -72.9107,
+  "baseFt": 1483,
+  "summitFt": 4083,
+  "url": "https://www.sugarbush.com"
+ },
+ {
+  "id": "mad-river-glen",
+  "name": "Mad River Glen",
+  "state": "VT",
+  "lat": 44.2002,
+  "lon": -72.9252,
+  "baseFt": 1600,
+  "summitFt": 3637,
+  "url": "https://www.madriverglen.com"
+ },
+ {
+  "id": "bolton-valley",
+  "name": "Bolton Valley",
+  "state": "VT",
+  "lat": 44.4182,
+  "lon": -72.8455,
+  "baseFt": 1446,
+  "summitFt": 3150,
+  "url": "https://www.boltonvalley.com"
+ },
+ {
+  "id": "killington",
+  "name": "Killington",
+  "state": "VT",
+  "lat": 43.6122,
+  "lon": -72.7987,
+  "baseFt": 1165,
+  "summitFt": 4241,
+  "url": "https://www.killington.com"
+ },
+ {
+  "id": "pico",
+  "name": "Pico Mountain",
+  "state": "VT",
+  "lat": 43.654,
+  "lon": -72.8424,
+  "baseFt": 1967,
+  "summitFt": 3967,
+  "url": "https://www.picomountain.com"
+ },
+ {
+  "id": "okemo",
+  "name": "Okemo",
+  "state": "VT",
+  "lat": 43.408,
+  "lon": -72.7313,
+  "baseFt": 1144,
+  "summitFt": 3344,
+  "url": "https://www.okemo.com"
+ },
+ {
+  "id": "mount-snow",
+  "name": "Mount Snow",
+  "state": "VT",
+  "lat": 42.9537,
+  "lon": -72.9052,
+  "baseFt": 1900,
+  "summitFt": 3600,
+  "url": "https://www.mountsnow.com"
+ },
+ {
+  "id": "stratton",
+  "name": "Stratton",
+  "state": "VT",
+  "lat": 43.1037,
+  "lon": -72.9091,
+  "baseFt": 1872,
+  "summitFt": 3875,
+  "url": "https://www.stratton.com"
+ },
+ {
+  "id": "bromley",
+  "name": "Bromley",
+  "state": "VT",
+  "lat": 43.2184,
+  "lon": -72.9375,
+  "baseFt": 1950,
+  "summitFt": 3284,
+  "url": "https://www.bromley.com"
+ },
+ {
+  "id": "magic-mountain",
+  "name": "Magic Mountain",
+  "state": "VT",
+  "lat": 43.1979,
+  "lon": -72.7658,
+  "baseFt": 1350,
+  "summitFt": 2850,
+  "url": "https://magicmtn.com"
+ },
+ {
+  "id": "saskadena-six",
+  "name": "Saskadena Six",
+  "state": "VT",
+  "lat": 43.6628,
+  "lon": -72.5451,
+  "baseFt": 550,
+  "summitFt": 1200,
+  "url": "https://www.saskadenasix.com"
+ },
+ {
+  "id": "middlebury-snowbowl",
+  "name": "Middlebury Snowbowl",
+  "state": "VT",
+  "lat": 43.9321,
+  "lon": -72.9561,
+  "baseFt": 1720,
+  "summitFt": 2720,
+  "url": "https://www.middleburysnowbowl.com"
+ },
+ {
+  "id": "cochrans",
+  "name": "Cochran's Ski Area",
+  "state": "VT",
+  "lat": 44.3927,
+  "lon": -72.9816,
+  "baseFt": 500,
+  "summitFt": 850,
+  "url": "https://www.cochranskiarea.com"
+ },
+ {
+  "id": "northeast-slopes",
+  "name": "Northeast Slopes",
+  "state": "VT",
+  "lat": 44.0715,
+  "lon": -72.2521,
+  "baseFt": 900,
+  "summitFt": 1260,
+  "url": "https://www.northeastslopes.org"
+ },
+ {
+  "id": "quechee",
+  "name": "Quechee Ski Area",
+  "state": "VT",
+  "lat": 43.6675,
+  "lon": -72.4483,
+  "baseFt": 600,
+  "summitFt": 1250,
+  "url": "https://quecheeclub.com"
+ },
+ {
+  "id": "lyndon-outing-club",
+  "name": "Lyndon Outing Club",
+  "state": "VT",
+  "lat": 44.5327,
+  "lon": -71.9849,
+  "baseFt": 800,
+  "summitFt": 1233,
+  "url": "https://www.skilyndon.com"
+ },
+ {
+  "id": "ascutney",
+  "name": "Ascutney Outdoors",
+  "state": "VT",
+  "lat": 43.4621,
+  "lon": -72.4642,
+  "baseFt": 800,
+  "summitFt": 1250,
+  "url": "https://www.ascutneyoutdoors.org"
+ },
+ {
+  "id": "bretton-woods",
+  "name": "Bretton Woods",
+  "state": "NH",
+  "lat": 44.2527,
+  "lon": -71.4658,
+  "baseFt": 1600,
+  "summitFt": 3100,
+  "url": "https://www.brettonwoods.com"
+ },
+ {
+  "id": "cannon",
+  "name": "Cannon Mountain",
+  "state": "NH",
+  "lat": 44.172,
+  "lon": -71.7028,
+  "baseFt": 1900,
+  "summitFt": 4080,
+  "url": "https://www.cannonmt.com"
+ },
+ {
+  "id": "loon",
+  "name": "Loon Mountain",
+  "state": "NH",
+  "lat": 44.0461,
+  "lon": -71.6355,
+  "baseFt": 950,
+  "summitFt": 3050,
+  "url": "https://www.loonmtn.com"
+ },
+ {
+  "id": "waterville-valley",
+  "name": "Waterville Valley",
+  "state": "NH",
+  "lat": 43.9612,
+  "lon": -71.5331,
+  "baseFt": 1984,
+  "summitFt": 4004,
+  "url": "https://www.waterville.com"
+ },
+ {
+  "id": "wildcat",
+  "name": "Wildcat Mountain",
+  "state": "NH",
+  "lat": 44.2587,
+  "lon": -71.2336,
+  "baseFt": 1950,
+  "summitFt": 4062,
+  "url": "https://www.skiwildcat.com"
+ },
+ {
+  "id": "attitash",
+  "name": "Attitash",
+  "state": "NH",
+  "lat": 44.0758,
+  "lon": -71.2363,
+  "baseFt": 600,
+  "summitFt": 2350,
+  "url": "https://www.attitash.com"
+ },
+ {
+  "id": "cranmore",
+  "name": "Cranmore",
+  "state": "NH",
+  "lat": 44.057,
+  "lon": -71.1021,
+  "baseFt": 600,
+  "summitFt": 1700,
+  "url": "https://www.cranmore.com"
+ },
+ {
+  "id": "black-mountain-nh",
+  "name": "Black Mountain",
+  "state": "NH",
+  "lat": 44.1643,
+  "lon": -71.164,
+  "baseFt": 1250,
+  "summitFt": 2350,
+  "url": "https://www.blackmt.com"
+ },
+ {
+  "id": "king-pine",
+  "name": "King Pine",
+  "state": "NH",
+  "lat": 43.8706,
+  "lon": -71.0901,
+  "baseFt": 500,
+  "summitFt": 850,
+  "url": "https://www.kingpine.com"
+ },
+ {
+  "id": "gunstock",
+  "name": "Gunstock",
+  "state": "NH",
+  "lat": 43.537,
+  "lon": -71.3702,
+  "baseFt": 900,
+  "summitFt": 2267,
+  "url": "https://www.gunstock.com"
+ },
+ {
+  "id": "ragged",
+  "name": "Ragged Mountain",
+  "state": "NH",
+  "lat": 43.4809,
+  "lon": -71.8457,
+  "baseFt": 1000,
+  "summitFt": 2250,
+  "url": "https://www.raggedmountainresort.com"
+ },
+ {
+  "id": "mount-sunapee",
+  "name": "Mount Sunapee",
+  "state": "NH",
+  "lat": 43.326,
+  "lon": -72.0769,
+  "baseFt": 1233,
+  "summitFt": 2743,
+  "url": "https://www.mountsunapee.com"
+ },
+ {
+  "id": "pats-peak",
+  "name": "Pats Peak",
+  "state": "NH",
+  "lat": 43.1584,
+  "lon": -71.7959,
+  "baseFt": 690,
+  "summitFt": 1460,
+  "url": "https://www.patspeak.com"
+ },
+ {
+  "id": "crotched",
+  "name": "Crotched Mountain",
+  "state": "NH",
+  "lat": 43.0081,
+  "lon": -71.8779,
+  "baseFt": 1050,
+  "summitFt": 2066,
+  "url": "https://www.crotchedmtn.com"
+ },
+ {
+  "id": "mcintyre",
+  "name": "McIntyre Ski Area",
+  "state": "NH",
+  "lat": 43.0051,
+  "lon": -71.4401,
+  "baseFt": 400,
+  "summitFt": 600,
+  "url": "https://www.mcintyreskiarea.com"
+ },
+ {
+  "id": "whaleback",
+  "name": "Whaleback",
+  "state": "NH",
+  "lat": 43.5998,
+  "lon": -72.1821,
+  "baseFt": 1100,
+  "summitFt": 1800,
+  "url": "https://www.whaleback.com"
+ },
+ {
+  "id": "dartmouth-skiway",
+  "name": "Dartmouth Skiway",
+  "state": "NH",
+  "lat": 43.7852,
+  "lon": -72.0984,
+  "baseFt": 975,
+  "summitFt": 1943,
+  "url": "https://sites.dartmouth.edu/skiway"
+ },
+ {
+  "id": "tenney",
+  "name": "Tenney Mountain",
+  "state": "NH",
+  "lat": 43.7449,
+  "lon": -71.7718,
+  "baseFt": 749,
+  "summitFt": 2149,
+  "url": "https://www.skitenney.com"
+ },
+ {
+  "id": "granite-gorge",
+  "name": "Granite Gorge",
+  "state": "NH",
+  "lat": 42.9695,
+  "lon": -72.2119,
+  "baseFt": 800,
+  "summitFt": 1325,
+  "url": "https://www.granitegorge.com"
+ },
+ {
+  "id": "sugarloaf",
+  "name": "Sugarloaf",
+  "state": "ME",
+  "lat": 45.0466,
+  "lon": -70.3137,
+  "baseFt": 1417,
+  "summitFt": 4237,
+  "url": "https://www.sugarloaf.com"
+ },
+ {
+  "id": "sunday-river",
+  "name": "Sunday River",
+  "state": "ME",
+  "lat": 44.4692,
+  "lon": -70.872,
+  "baseFt": 800,
+  "summitFt": 3140,
+  "url": "https://www.sundayriver.com"
+ },
+ {
+  "id": "saddleback",
+  "name": "Saddleback",
+  "state": "ME",
+  "lat": 44.9428,
+  "lon": -70.5218,
+  "baseFt": 2120,
+  "summitFt": 4120,
+  "url": "https://www.saddlebackmaine.com"
+ },
+ {
+  "id": "mt-abram",
+  "name": "Mt. Abram",
+  "state": "ME",
+  "lat": 44.3763,
+  "lon": -70.7115,
+  "baseFt": 1100,
+  "summitFt": 2250,
+  "url": "https://www.mtabram.com"
+ },
+ {
+  "id": "pleasant-mountain",
+  "name": "Pleasant Mountain",
+  "state": "ME",
+  "lat": 44.0522,
+  "lon": -70.8168,
+  "baseFt": 600,
+  "summitFt": 1900,
+  "url": "https://www.pleasantmountain.com"
+ },
+ {
+  "id": "lost-valley",
+  "name": "Lost Valley",
+  "state": "ME",
+  "lat": 44.1359,
+  "lon": -70.2825,
+  "baseFt": 255,
+  "summitFt": 495,
+  "url": "https://www.lostvalleyski.com"
+ },
+ {
+  "id": "black-mountain-me",
+  "name": "Black Mountain of Maine",
+  "state": "ME",
+  "lat": 44.5784,
+  "lon": -70.6197,
+  "baseFt": 970,
+  "summitFt": 2350,
+  "url": "https://www.skiblackmountain.org"
+ },
+ {
+  "id": "camden-snow-bowl",
+  "name": "Camden Snow Bowl",
+  "state": "ME",
+  "lat": 44.2145,
+  "lon": -69.1394,
+  "baseFt": 150,
+  "summitFt": 1080,
+  "url": "https://camdensnowbowl.com"
+ },
+ {
+  "id": "big-moose",
+  "name": "Big Moose Mountain",
+  "state": "ME",
+  "lat": 45.503,
+  "lon": -69.7022,
+  "baseFt": 1325,
+  "summitFt": 1800,
+  "url": "https://www.skibigmoose.com"
+ },
+ {
+  "id": "titcomb",
+  "name": "Titcomb Mountain",
+  "state": "ME",
+  "lat": 44.6486,
+  "lon": -70.1718,
+  "baseFt": 400,
+  "summitFt": 750,
+  "url": "https://www.titcombmountain.com"
+ },
+ {
+  "id": "hermon",
+  "name": "Hermon Mountain",
+  "state": "ME",
+  "lat": 44.7791,
+  "lon": -68.9597,
+  "baseFt": 100,
+  "summitFt": 450,
+  "url": "https://www.skihermonmountain.com"
+ },
+ {
+  "id": "bigrock",
+  "name": "Bigrock Mountain",
+  "state": "ME",
+  "lat": 46.5237,
+  "lon": -67.8231,
+  "baseFt": 670,
+  "summitFt": 1650,
+  "url": "https://www.bigrockmaine.com"
+ },
+ {
+  "id": "lonesome-pine",
+  "name": "Lonesome Pine Trails",
+  "state": "ME",
+  "lat": 47.2438,
+  "lon": -68.5939,
+  "baseFt": 550,
+  "summitFt": 1050,
+  "url": "https://www.lonesomepines.org"
+ },
+ {
+  "id": "wachusett",
+  "name": "Wachusett Mountain",
+  "state": "MA",
+  "lat": 42.4981,
+  "lon": -71.8871,
+  "baseFt": 1006,
+  "summitFt": 2006,
+  "url": "https://www.wachusett.com"
+ },
+ {
+  "id": "jiminy-peak",
+  "name": "Jiminy Peak",
+  "state": "MA",
+  "lat": 42.5674,
+  "lon": -73.2772,
+  "baseFt": 1230,
+  "summitFt": 2380,
+  "url": "https://www.jiminypeak.com"
+ },
+ {
+  "id": "berkshire-east",
+  "name": "Berkshire East",
+  "state": "MA",
+  "lat": 42.6174,
+  "lon": -72.8752,
+  "baseFt": 590,
+  "summitFt": 1510,
+  "url": "https://berkshireeast.com"
+ },
+ {
+  "id": "catamount",
+  "name": "Catamount",
+  "state": "MA",
+  "lat": 42.1661,
+  "lon": -73.4782,
+  "baseFt": 1000,
+  "summitFt": 2000,
+  "url": "https://catamountski.com"
+ },
+ {
+  "id": "butternut",
+  "name": "Ski Butternut",
+  "state": "MA",
+  "lat": 42.1798,
+  "lon": -73.3194,
+  "baseFt": 800,
+  "summitFt": 1800,
+  "url": "https://www.skibutternut.com"
+ },
+ {
+  "id": "bousquet",
+  "name": "Bousquet Mountain",
+  "state": "MA",
+  "lat": 42.4163,
+  "lon": -73.2796,
+  "baseFt": 1125,
+  "summitFt": 1875,
+  "url": "https://bousquetmountain.com"
+ },
+ {
+  "id": "otis-ridge",
+  "name": "Otis Ridge",
+  "state": "MA",
+  "lat": 42.1951,
+  "lon": -73.0993,
+  "baseFt": 1300,
+  "summitFt": 1700,
+  "url": "https://www.otisridge.com"
+ },
+ {
+  "id": "nashoba-valley",
+  "name": "Nashoba Valley",
+  "state": "MA",
+  "lat": 42.542,
+  "lon": -71.4476,
+  "baseFt": 200,
+  "summitFt": 440,
+  "url": "https://skinashoba.com"
+ },
+ {
+  "id": "blue-hills",
+  "name": "Blue Hills",
+  "state": "MA",
+  "lat": 42.2144,
+  "lon": -71.1171,
+  "baseFt": 325,
+  "summitFt": 635,
+  "url": "https://www.bluehillsboston.com"
+ },
+ {
+  "id": "ski-bradford",
+  "name": "Ski Bradford",
+  "state": "MA",
+  "lat": 42.7431,
+  "lon": -71.0569,
+  "baseFt": 100,
+  "summitFt": 348,
+  "url": "https://skibradford.com"
+ },
+ {
+  "id": "ski-ward",
+  "name": "Ski Ward",
+  "state": "MA",
+  "lat": 42.3006,
+  "lon": -71.6814,
+  "baseFt": 420,
+  "summitFt": 640,
+  "url": "https://www.skiward.com"
+ },
+ {
+  "id": "mohawk-mountain",
+  "name": "Mohawk Mountain",
+  "state": "CT",
+  "lat": 41.8353,
+  "lon": -73.3109,
+  "baseFt": 960,
+  "summitFt": 1600,
+  "url": "https://www.mohawkmtn.com"
+ },
+ {
+  "id": "ski-sundown",
+  "name": "Ski Sundown",
+  "state": "CT",
+  "lat": 41.883,
+  "lon": -72.9439,
+  "baseFt": 450,
+  "summitFt": 1075,
+  "url": "https://www.skisundown.com"
+ },
+ {
+  "id": "mount-southington",
+  "name": "Mount Southington",
+  "state": "CT",
+  "lat": 41.5818,
+  "lon": -72.9287,
+  "baseFt": 225,
+  "summitFt": 525,
+  "url": "https://www.mountsouthington.com"
+ },
+ {
+  "id": "powder-ridge",
+  "name": "Powder Ridge",
+  "state": "CT",
+  "lat": 41.5013,
+  "lon": -72.7407,
+  "baseFt": 225,
+  "summitFt": 720,
+  "url": "https://powderridgepark.com"
+ },
+ {
+  "id": "yawgoo-valley",
+  "name": "Yawgoo Valley",
+  "state": "RI",
+  "lat": 41.517,
+  "lon": -71.5297,
+  "baseFt": 70,
+  "summitFt": 315,
+  "url": "https://www.yawgoo.com"
+ }
+]
