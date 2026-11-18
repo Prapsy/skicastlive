@@ -19,7 +19,10 @@ export const clip = (s, n = 180) => { s = String(s ?? '').replace(/\s+/g, ' ').t
 export function openingNote(body) {
   const t = String(body ?? '').replace(/\s+/g, ' ');
   const m = t.match(/[^.!?]{0,90}\b(opening day|opening date|open(?:s|ing)? for the (?:\d{2,4}[-/]\d{2,4} )?season|projected opening|plan(?:s|ning)? to open|scheduled to open|target(?:ed|ing)? opening|re-?open(?:s|ing)?)\b[^.!?]{0,110}\b(?:Jan|Feb|Mar|Nov|Dec)[a-z]*\.? \d{1,2}(?:st|nd|rd|th)?[^.!?]{0,40}[.!?]?/i);
-  return m ? clip(m[0].trim(), 200) : null;
+  if (!m) return null;
+  let q = m[0].trim();
+  if (!/[.!?]$/.test(q)) q = q.replace(/\s+\S*$/, '') + '…'; // the match can stop mid-word; end on a whole word
+  return clip(q, 200);
 }
 
 /** Try to turn an opening note into an ISO date (current ski season). Returns null if unsure. */
