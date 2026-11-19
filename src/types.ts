@@ -23,7 +23,7 @@ export interface Terrain {
   lifts: { id: number | null; n: string | null; k: string; c: [number, number][]; e: [number, number] }[];
   runs: { n: string | null; d: string; c: [number, number][]; e: [number, number] }[];
 }
-export interface Group { id: string; name: string; blurb: string; label: [number, number] }
+export interface Group { id: string; name: string; blurb: string; label: [number, number]; side: 'left' | 'right' }
 export interface Region { code: string; name: string; country: string; group: string }
 
 export const GROUPS = regionsJson.groups as unknown as Group[];

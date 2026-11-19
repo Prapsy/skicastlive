@@ -1,14 +1,14 @@
 {
  "groups": [
-  { "id": "northeast", "name": "Northeast", "blurb": "New England & New York", "label": [-61.5, 40.2] },
-  { "id": "southeast", "name": "Mid-Atlantic & Southeast", "blurb": "Pennsylvania to the Smokies", "label": [-71.5, 28.5] },
-  { "id": "midwest", "name": "Midwest", "blurb": "Great Lakes & the Plains", "label": [-91.5, 51.5] },
-  { "id": "rockies", "name": "Rockies", "blurb": "Colorado, Utah & the Mountain West", "label": [-107.5, 29.0] },
-  { "id": "pnw", "name": "Pacific Northwest", "blurb": "Washington & Oregon", "label": [-131.5, 45.5] },
-  { "id": "california", "name": "California & Tahoe", "blurb": "The Sierra & Southern California", "label": [-128.0, 34.5] },
-  { "id": "alaska", "name": "Alaska", "blurb": "The Last Frontier", "label": [-153.0, 56.0] },
-  { "id": "canada-west", "name": "Western Canada", "blurb": "British Columbia & Alberta", "label": [-124.0, 59.5] },
-  { "id": "canada-east", "name": "Eastern Canada", "blurb": "Ontario & Quebec", "label": [-73.5, 53.5] }
+  { "id": "northeast", "name": "Northeast", "blurb": "New England & New York", "label": [-66, 40.5], "side": "right" },
+  { "id": "southeast", "name": "Appalachians", "blurb": "Pennsylvania to the Smokies", "label": [-74.5, 33], "side": "right" },
+  { "id": "midwest", "name": "Midwest", "blurb": "Great Lakes & the Plains", "label": [-96, 50.5], "side": "left" },
+  { "id": "rockies", "name": "Rockies", "blurb": "Colorado, Utah & the Mountain West", "label": [-113.5, 30.5], "side": "left" },
+  { "id": "pnw", "name": "Pacific Northwest", "blurb": "Washington & Oregon", "label": [-127, 46], "side": "left" },
+  { "id": "california", "name": "California & Tahoe", "blurb": "The Sierra & Southern California", "label": [-124.5, 35.5], "side": "left" },
+  { "id": "alaska", "name": "Alaska", "blurb": "The Last Frontier", "label": [-150, 55.5], "side": "left" },
+  { "id": "canada-west", "name": "Western Canada", "blurb": "British Columbia & Alberta", "label": [-112, 59], "side": "right" },
+  { "id": "canada-east", "name": "Eastern Canada", "blurb": "Ontario & Quebec", "label": [-72, 53], "side": "right" }
  ],
  "regions": [
   { "code": "ME", "name": "Maine", "country": "US", "group": "northeast", "ots": "maine" },

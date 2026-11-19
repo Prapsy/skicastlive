@@ -1,14 +1,13 @@
 // The mountain panel: Report · Weather · Ski map · News.
 import { select } from 'd3-selection';
 import { zoom as d3zoom, zoomIdentity } from 'd3-zoom';
-import { type Mountain, type Lift, type LiftStatus, type Terrain, $, esc, vert, statusWord, regionName, snow, temp, tempUnit, elev, wind, ago, dayName, longDate, shortDate, wxGlyph, depthIn } from './types';
+import { type Mountain, type Lift, type LiftStatus, type Terrain, type Group, REGIONS, $, esc, vert, statusWord, regionName, snow, temp, tempUnit, elev, wind, ago, dayName, longDate, shortDate, wxGlyph, depthIn } from './types';
 
 type Tab = 'report' | 'weather' | 'map' | 'news';
 const TABS: [Tab, string][] = [['report', 'Report'], ['weather', 'Weather'], ['map', 'Ski map'], ['news', 'News']];
 const panel = $<HTMLElement>('#panel');
 let current: Mountain | null = null;
 let tab: Tab = 'report';
-let onClose: () => void = () => {};
 const terrainCache = new Map<string, Promise<Terrain | null>>();
 const host = (u: string) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return 'resort site'; } };
 const link = (href: string | null | undefined, label: string, cls = 'btn') => href ? `<a class="${cls}" href="${esc(href)}" target="_blank" rel="noopener">${esc(label)}</a>` : '';
@@ -135,10 +134,9 @@ function mapTab(m: Mountain) {
     <p class="foot">Drawn from OpenStreetMap data (© OpenStreetMap contributors, via OpenSkiMap), not the resort’s own artwork. Runs show their rated difficulty, not whether they are open today.</p>`;
 }
 
-async function drawSkiMap(m: Mountain) {
+async function drawSkiMap(m: Mountain, box: HTMLElement | null, W = 368, H = 320) {
   const t = await loadTerrain(m);
-  const box = panel.querySelector<HTMLElement>('#skimap');
-  if (!box || current?.id !== m.id || tab !== 'map') return;
+  if (!box || !box.isConnected || current?.id !== m.id) return;
   if (!t || (!t.lifts.length && !t.runs.length)) { box.innerHTML = '<p class="muted">No map data for this mountain yet.</p>'; return; }
   const status = new Map<number, Lift>();
   for (const l of m.lifts?.list ?? []) if (l.osmId) status.set(l.osmId, l);
@@ -159,7 +157,7 @@ async function drawSkiMap(m: Mountain) {
   const xy = (p: [number, number]): [number, number] => { const x = (p[0] - lon0) * kx, y = p[1] - lat0; return [x * cos - y * sin, -(x * sin + y * cos)]; };
   const proj = pts.map(xy);
   const minX = Math.min(...proj.map(p => p[0])), maxX = Math.max(...proj.map(p => p[0])), minY = Math.min(...proj.map(p => p[1])), maxY = Math.max(...proj.map(p => p[1]));
-  const W = 368, H = 320, pad = 16;
+  const pad = 16;
   const s = Math.min((W - 2 * pad) / Math.max(maxX - minX, 1e-6), (H - 2 * pad) / Math.max(maxY - minY, 1e-6));
   const ox = (W - (maxX - minX) * s) / 2, oy = (H - (maxY - minY) * s) / 2;
   const P = (p: [number, number]) => { const q = xy(p); return `${(ox + (q[0] - minX) * s).toFixed(1)},${(oy + (q[1] - minY) * s).toFixed(1)}`; };
@@ -198,34 +196,119 @@ async function drawSkiMap(m: Mountain) {
   svgEl.addEventListener('click', ev => { const g = (ev.target as Element).closest('g.run, g.lift'); if (g) show(g); });
 }
 
-// ---------------------------------------------------------------- shell
-function render(keepScroll = false) {
-  const m = current;
-  if (!m) return;
-  const y = panel.scrollTop;
-  const body = tab === 'report' ? reportTab(m) : tab === 'weather' ? weatherTab(m) : tab === 'map' ? mapTab(m) : newsTab(m);
-  panel.innerHTML = `
-    <button class="close" aria-label="Close and zoom out">×</button>
-    <header>
+// ---------------------------------------------------------------- region list
+function regionView(animate: boolean) {
+  const { group, mountains } = region!;
+  const codes = REGIONS.filter(r => r.group === group.id && mountains.some(m => m.state === r.code));
+  const ms = stateFilter ? mountains.filter(m => m.state === stateFilter) : mountains;
+  const open = ms.filter(m => m.season.status === 'open').sort((a, b) => (b.lifts?.open ?? 0) - (a.lifts?.open ?? 0) || vert(b) - vert(a));
+  const closed = ms.filter(m => m.season.status === 'closed').sort((a, b) => (a.season.openingDate ?? '9').localeCompare(b.season.openingDate ?? '9') || vert(b) - vert(a));
+  const unknown = ms.filter(m => m.season.status === 'unknown').sort((a, b) => a.name.localeCompare(b.name));
+  let i = 0;
+  const row = (m: Mountain) => {
+    const s = m.season.status;
+    const right = s === 'open' ? (m.lifts ? `<b>${m.lifts.open}</b> of ${m.lifts.total} lifts` : 'Open')
+      : s === 'closed' ? (m.season.openingDate ? `Opens <b>${shortDate(m.season.openingDate)}</b>` : 'Closed, no date yet') : 'See resort site';
+    return `<li style="--i:${Math.min(i++, 22)}"><button data-m="${m.id}"><span class="dot s-${s}"></span>
+      <span class="n">${esc(m.name)}<em>${stateFilter ? elev(vert(m)) + ' vertical' : m.state}</em></span><span class="v">${right}</span></button></li>`;
+  };
+  const block = (title: string, list: Mountain[]) => list.length ? `<h3 class="lh">${title}, ${list.length}</h3><ul class="mlist">${list.map(row).join('')}</ul>` : '';
+  panel.className = `region${animate ? ' enter' : ''}`;
+  panel.innerHTML = `<button class="close" aria-label="Back to all regions">×</button>
+    <header><button class="crumb" data-back>All regions</button>
+      <h2>${esc(group.name)}</h2>
+      <p class="meta">${open.length ? `${open.length} of ${ms.length} mountains open now.` : `None of the ${ms.length} mountains here is open yet.`} Pick one for lifts, snow and its ski map.</p>
+      ${codes.length > 1 ? `<div class="states"><button data-state="" aria-pressed="${!stateFilter}">All</button>${codes.map(r => `<button data-state="${r.code}" aria-pressed="${stateFilter === r.code}" title="${esc(r.name)}">${r.code}</button>`).join('')}</div>` : ''}
+    </header>
+    ${block('Open now', open)}${block('Opening soon', closed)}${block('Check the resort’s site', unknown)}`;
+}
+
+// ---------------------------------------------------------------- mountain
+function mountainView(m: Mountain) {
+  const head = `<header>
+      ${region ? `<button class="crumb" data-back>${esc(region.group.name)}</button>` : ''}
       <span class="pill p-${m.season.status}">${esc(statusWord(m))}</span>
       <h2>${esc(m.name)}</h2>
       <p class="meta">${esc(regionName(m.state))}. Summit ${elev(m.summitFt)}, ${elev(vert(m))} of vertical.</p>
-    </header>
+    </header>`;
+  if (expanded) {
+    panel.className = 'mountain full';
+    panel.innerHTML = `<div class="xbar"><button class="crumb" data-collapse>Back to the globe</button><button class="close" aria-label="Close full view">×</button></div>
+      <div class="xgrid">
+        <div class="xinfo">${head}${reportTab(m)}<h3 class="xh">Weather</h3>${weatherTab(m)}<h3 class="xh">News</h3>${newsTab(m)}</div>
+        <div class="xmap"><div id="bigmap" class="skimap big"><p class="muted">${m.terrain ? 'Drawing the mountain…' : 'No map data for this mountain yet.'}</p></div>
+          <div class="xmapfoot">${link(m.trailMapUrl ?? m.url, 'Official trail map on the resort site', 'btn ghost')}
+            <p class="foot">Drawn from OpenStreetMap data (© OpenStreetMap contributors, via OpenSkiMap), not the resort’s own artwork. Runs show rated difficulty, not whether they are open today.</p></div></div>
+      </div>`;
+    const wide = window.innerWidth >= 900;
+    const W = Math.max(300, Math.round(wide ? window.innerWidth / 2 - 56 : window.innerWidth - 32));
+    const H = Math.max(260, Math.round(wide ? panel.clientHeight - 210 : 320));
+    drawSkiMap(m, panel.querySelector<HTMLElement>('#bigmap'), W, H);
+    return;
+  }
+  const body = tab === 'report' ? reportTab(m) : tab === 'weather' ? weatherTab(m) : tab === 'map' ? mapTab(m) : newsTab(m);
+  panel.className = 'mountain';
+  panel.innerHTML = `<button class="close" aria-label="${region ? 'Back to the region' : 'Close'}">×</button>${head}
+    <button class="expand" data-expand>Open full view<span>Everything on the left, the ski map on the right</span></button>
     <nav class="tabs" role="tablist">${TABS.map(([id, label]) => `<button role="tab" aria-selected="${id === tab}" data-tab="${id}">${label}</button>`).join('')}</nav>
     <div class="tabbody">${body}</div>`;
+  if (tab === 'map') drawSkiMap(m, panel.querySelector<HTMLElement>('#skimap'));
+}
+
+// ---------------------------------------------------------------- shell
+let region: { group: Group; mountains: Mountain[] } | null = null;
+let stateFilter: string | null = null;
+let expanded = false;
+let cb = { back: () => {}, pick: (_m: Mountain) => {}, scope: (_ms: Mountain[]) => {}, hover: (_id: string | null) => {}, expand: (_on: boolean) => {} };
+
+function render(keepScroll = false, animate = false) {
+  const y = panel.scrollTop;
+  if (current) mountainView(current); else if (region) regionView(animate); else { panel.hidden = true; document.body.classList.remove('has-panel', 'expanded'); return; }
   panel.hidden = false;
   panel.scrollTop = keepScroll ? y : 0;
   document.body.classList.add('has-panel');
-  panel.querySelector('.close')!.addEventListener('click', () => onClose());
-  panel.querySelectorAll<HTMLButtonElement>('.tabs button').forEach(b => b.addEventListener('click', () => { tab = b.dataset.tab as Tab; render(); }));
-  if (tab === 'map') drawSkiMap(m);
+  document.body.classList.toggle('expanded', expanded && !!current);
 }
+const setExpanded = (on: boolean) => { if (on === expanded) return; expanded = on; render(); cb.expand(on); };
+
+panel.addEventListener('click', ev => {
+  const b = (ev.target as Element).closest('button') as HTMLButtonElement | null;
+  if (!b) return;
+  if (b.dataset.m) { const m = region?.mountains.find(x => x.id === b.dataset.m); if (m) cb.pick(m); }
+  else if (b.dataset.tab) { tab = b.dataset.tab as Tab; render(); }
+  else if ('state' in b.dataset) { stateFilter = b.dataset.state || null; render(false, true); cb.scope(mountainPanel.scope()); }
+  else if ('expand' in b.dataset) setExpanded(true);
+  else if ('collapse' in b.dataset || (b.classList.contains('close') && expanded)) setExpanded(false);
+  else if ('back' in b.dataset || b.classList.contains('close')) cb.back();
+});
+const hover = (ev: Event) => { const b = (ev.target as Element).closest?.('button[data-m]') as HTMLElement | null; cb.hover(b?.dataset.m ?? null); };
+panel.addEventListener('mouseover', hover);
+panel.addEventListener('focusin', hover);
+panel.addEventListener('mouseleave', () => cb.hover(null));
 
 export const mountainPanel = {
-  init(opts: { onClose: () => void }) { onClose = opts.onClose; },
+  init(opts: Partial<typeof cb>) { cb = { ...cb, ...opts }; },
+  /** Show a region's mountains (animated in), or go back to them from a mountain. */
+  showRegion(group: Group, mountains: Mountain[]) {
+    const fresh = region?.group.id !== group.id;
+    if (fresh) stateFilter = null;
+    region = { group, mountains };
+    const wasMountain = !!current;
+    current = null; expanded = false;
+    render(!fresh && !wasMountain, fresh || wasMountain);
+  },
   show(m: Mountain) { const same = current?.id === m.id; current = m; if (!same) tab = 'report'; render(same); },
   /** Fresh data or a units change: redraw in place. */
-  refresh(m?: Mountain) { if (m) current = m; if (current && !panel.hidden) render(true); },
-  hide() { current = null; panel.hidden = true; document.body.classList.remove('has-panel'); },
-  get isOpen() { return !panel.hidden; },
+  refresh(mountains?: Mountain[]) {
+    if (mountains) {
+      if (current) current = mountains.find(x => x.id === current!.id) ?? current;
+      if (region) region = { group: region.group, mountains: mountains.filter(m => m.group === region!.group.id) };
+    }
+    if (!panel.hidden) render(true);
+  },
+  hide() { current = null; region = null; expanded = false; render(); },
+  collapse() { setExpanded(false); },
+  /** The mountains the list is showing (the region, narrowed to a state if one is chosen). */
+  scope() { return region ? (stateFilter ? region.mountains.filter(m => m.state === stateFilter) : region.mountains) : []; },
+  get isExpanded() { return expanded; },
 };
