@@ -65,34 +65,48 @@ const fitK = (radius: number) => { const f = free(); return 0.44 * Math.min(f.fw
 const mountainK = () => fitK(0.035);
 const nearestGroup = (maxRad: number) => { let best: string | null = null, bd = maxRad; for (const c of callouts) { const d = geoDistance(centre(), c.at); if (d < bd) { bd = d; best = c.id; } } return best; };
 
+// Wheel and pinch zoom glide instead of jumping: the handler only sets where the view should end up
+// (kGoal, rotGoal) and a per-frame ease carries the globe there. Dragging stays direct.
+let kGoal = k, rotGoal: [number, number] = [...rot], glide = 0, glideAt = 0;
+function glideStep(now: number) {
+  const dt = Math.min(64, now - glideAt); glideAt = now;
+  const fk = 1 - Math.exp(-dt / 110), fr = 1 - Math.exp(-dt / 300);
+  k = Math.exp(Math.log(k) + (Math.log(kGoal) - Math.log(k)) * fk);
+  const dLon = ((rotGoal[0] - rot[0] + 540) % 360) - 180, dLat = rotGoal[1] - rot[1];
+  rot = [rot[0] + dLon * fr, rot[1] + dLat * fr];
+  const done = Math.abs(Math.log(kGoal / k)) < 0.002 && Math.abs(dLon) < 0.03 && Math.abs(dLat) < 0.03;
+  if (done) { k = kGoal; rot = [rot[0] + dLon, rotGoal[1]]; glide = 0; } else glide = requestAnimationFrame(glideStep);
+  draw();
+}
+const startGlide = () => { if (!glide) { glideAt = performance.now(); glide = requestAnimationFrame(glideStep); } };
+const stopGlide = () => { cancelAnimationFrame(glide); glide = 0; };
+
 const zoomer = d3zoom<SVGSVGElement, unknown>().scaleExtent([1, K_MAX]).on('zoom', ev => {
   const t: ZoomTransform = ev.transform;
   if (ev.sourceEvent) {
     cancelAnimationFrame(anim);
     if (Math.abs(t.k - lastT.k) > 1e-9) {
-      const out = t.k < k;
-      k = t.k;
-      // Fixed axis: the last stretch of zooming out swings the globe back to face North America.
-      if (out && k < homeK * 1.5) {
-        const f = Math.min(1, (homeK * 1.5 - k) / (homeK * 0.5));
-        const dLon = ((-HOME[0] - rot[0] + 540) % 360) - 180;
-        rot = [rot[0] + dLon * f, rot[1] + (-HOME[1] - rot[1]) * f];
-      }
-      // Stepping through levels by zooming.
-      // (one fast fling can cross two boundaries, so these are checked one after the other)
-      if (out && selected && k < mountainK() * 0.42) cb.level('region');
-      if (out && focusGroup && !selected && k < Math.min(Math.max(homeK * 1.25, focusK * 0.62), homeK * 2)) cb.level('overview');
-      if (!out && !focusGroup && k > homeK * 2.6) { const g = nearestGroup(0.5); if (g) { focusK = k; cb.level('enter', g); } }
+      const out = t.k < lastT.k;
+      if (!glide) rotGoal = [...rot];
+      kGoal = t.k;
+      // Fixed axis: zooming out towards the full view always settles facing North America.
+      if (out && kGoal < homeK * 1.6) rotGoal = [-HOME[0], -HOME[1]];
+      // Stepping through levels by zooming (one fast fling can cross two boundaries, so these are checked in turn).
+      if (out && selected && kGoal < mountainK() * 0.42) cb.level('region');
+      if (out && focusGroup && !selected && kGoal < Math.min(Math.max(homeK * 1.25, focusK * 0.62), homeK * 2)) cb.level('overview');
+      if (!out && !focusGroup && kGoal > homeK * 2.6) { const g = nearestGroup(0.5); if (g) { focusK = kGoal; cb.level('enter', g); } }
+      startGlide();
     } else {
       const deg = 180 / Math.PI / (r0 * k);
       rot = [rot[0] + (t.x - lastT.x) * deg, clampLat(rot[1] - (t.y - lastT.y) * deg)];
+      rotGoal = [...rot];
+      schedule();
     }
-    schedule();
   }
   lastT = t;
 });
 svg.call(zoomer).on('dblclick.zoom', null);
-const syncZoom = () => { lastT = zoomIdentity.translate(lastT.x, lastT.y).scale(k); svg.property('__zoom', lastT); };
+const syncZoom = () => { kGoal = k; rotGoal = [...rot]; lastT = zoomIdentity.translate(lastT.x, lastT.y).scale(k); svg.property('__zoom', lastT); };
 
 /** Which region is under a screen point (overview only). */
 function groupAt(ev: MouseEvent): string | null {
@@ -119,8 +133,14 @@ const markerSize = (m: Mountain) => 5 + 6.5 * Math.sqrt(Math.min(Math.max(vert(m
 const markerScale = () => Math.max(0.46, Math.min(w < 600 ? 0.8 : 1.05, 0.34 + k * 0.045));
 const lit = (m: Mountain) => selected?.id === m.id || (!!focusGroup && m.group === focusGroup);
 
+// The globe's centre on screen eases to its new spot when a panel opens or closes, instead of jumping.
+let ccx = NaN, ccy = NaN;
 function draw() {
   const f = free();
+  if (Number.isNaN(ccx) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { ccx = f.cx; ccy = f.cy; }
+  else if (Math.abs(f.cx - ccx) > 0.5 || Math.abs(f.cy - ccy) > 0.5) { ccx += (f.cx - ccx) * 0.14; ccy += (f.cy - ccy) * 0.14; schedule(); }
+  else { ccx = f.cx; ccy = f.cy; }
+  f.cx = ccx; f.cy = ccy;
   projection.scale(r0 * k).translate([f.cx, f.cy]).rotate([rot[0], rot[1]]);
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -290,7 +310,7 @@ function placeSoon() {
 
 /** Animate the globe to look at a point at a zoom level. Long trips pull back a little on the way. */
 function flyTo(target: [number, number], toK: number, ms = 1300) {
-  cancelAnimationFrame(anim);
+  cancelAnimationFrame(anim); stopGlide();
   toK = Math.max(homeK, Math.min(K_MAX, toK));
   const from = [...rot] as [number, number], fromK = k;
   const to: [number, number] = [-target[0], clampLat(-target[1])];
@@ -328,7 +348,7 @@ export const globe = {
     if (!sized) { sized = true; onReady ? onReady() : this.home(0); } else draw();
   },
   /** The free area changed (a panel opened or closed): the furthest zoom-out is the view that frames North America. */
-  refit() { homeK = fitK(0.62); zoomer.scaleExtent([homeK, K_MAX]); if (k < homeK) { k = homeK; syncZoom(); } },
+  refit() { homeK = fitK(0.62); zoomer.scaleExtent([homeK, K_MAX]); if (kGoal < homeK) kGoal = homeK; if (k < homeK && !glide) { k = homeK; syncZoom(); } },
   /** Run once the globe has a size (the page may load in a hidden tab). */
   whenReady(fn: () => void) { if (sized) fn(); else onReady = fn; },
   setMountains(ms: Mountain[]) { mountains = ms; bindMarkers(); bindCallouts(); schedule(); document.fonts?.ready.then(() => { for (const c of callouts) c.width = 0; schedule(); }); },
