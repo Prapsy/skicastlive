@@ -4,6 +4,9 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const root = new URL('../', import.meta.url);
 const mountains = JSON.parse(readFileSync(new URL('data/mountains.json', root)));
 const UA = 'skicastlive-build/0.1 (ski conditions site)';
+// Older lifts-only fetch (Overpass). The ski maps now come from scripts/fetch-terrain.mjs; this stays for mountains
+// OpenSkiMap does not cover. Pass --recenter to also move each mountain's coordinates onto its lifts.
+const recenter = process.argv.includes('--recenter');
 const SKIP = new Set(['goods', 'zip_line', 'station', 'pylon', 'construction', 'proposed', 'abandoned', 'disused']);
 const D = 0.04;
 // Resorts that sit close together or span several peaks need explicit anchor points.
@@ -52,7 +55,7 @@ for (const m of mountains) {
   }));
   writeFileSync(new URL(`data/lifts/${m.id}.geojson`, root), JSON.stringify({ type: 'FeatureCollection',
     attribution: '© OpenStreetMap contributors (ODbL)', features: feats }));
-  if (feats.length) { const [cy, cx] = centroid(assigned[m.id]); m.lat = +cy.toFixed(4); m.lon = +cx.toFixed(4); }
+  if (recenter && feats.length) { const [cy, cx] = centroid(assigned[m.id]); m.lat = +cy.toFixed(4); m.lon = +cx.toFixed(4); }
   console.log(`${m.id}: ${feats.length} | ` + feats.map(f => f.properties.name || '?').join('; '));
 }
-writeFileSync(new URL('data/mountains.json', root), JSON.stringify(mountains, null, 1));
+if (recenter) writeFileSync(new URL('data/mountains.json', root), JSON.stringify(mountains, null, 1));

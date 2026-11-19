@@ -8,7 +8,10 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "update": "node scripts/update.mjs",
-    "lifts": "node scripts/fetch-lifts.mjs"
+    "lifts": "node scripts/fetch-lifts.mjs",
+    "seed": "node scripts/seed-resorts.mjs",
+    "terrain": "node scripts/fetch-terrain.mjs",
+    "geo": "node scripts/build-geo.mjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",
@@ -27,6 +30,7 @@
     "cheerio": "^1.0.0",
     "typescript": "^5.6.0",
     "us-atlas": "^3.0.1",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "world-atlas": "^2.0.2"
   }
 }

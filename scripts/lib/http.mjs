@@ -1,5 +1,5 @@
 // Polite HTTP helper: identified user agent, timeout, robots.txt check, no retries on blocks.
-export const UA = 'SkiCastLiveBot/0.1 (New England ski conditions map; reads public snow reports)';
+export const UA = 'SkiCastLiveBot/0.1 (North America ski conditions map; reads public snow reports)';
 const robotsCache = new Map();
 
 async function robotsFor(origin) {

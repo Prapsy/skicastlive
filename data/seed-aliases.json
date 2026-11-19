@@ -1,0 +1,45 @@
+{
+ "new-hermon-mountain": {
+  "id": "hermon"
+ },
+ "ski-sawmill": "Ski Sawmill Family Resort",
+ "the-homestead-ski-area": "The Homestead Ski Area",
+ "crystal-mountain": "Crystal Mountain",
+ "boyne-highlands": "Boyne Highlands Resort",
+ "treetops-resort": "Treetops Sylvan Resort",
+ "grand-geneva": "The Mountain Top at Grand Geneva Resort & Spa",
+ "wolf-creek": "Nordic Valley Resort (Wolf Mountain)",
+ "sun-valley": "Sun Valley - Bald Mountain",
+ "sipapu-ski-and-summer-resort": "Sipapu Ski and Summer Resort",
+ "ski-santa-fe": "Ski Santa Fe, Santa Fe, Q38555",
+ "the-summit-at-snoqualmie": "Summit West",
+ "northstar-california": "Northstar at Tahoe Resort",
+ "snow-valley": "Snow Valley Mountain Resort",
+ "elko-snobowl": "Snobowl Bike and Ski area",
+ "mount-baldy-ski-corporation": "Mt. Baldy Family Ski Area",
+ "silver-star": "Silver Star Mountain Resort",
+ "winsport": "WinSport (Canada Olympic Park)",
+ "hidden-valley": "Hidden Valley Highlands Ski Area",
+ "stoneham": "Station touristique Stoneham",
+ "tremblant": "Mont Tremblant Resort, Station Mont Tremblant",
+ "snowriver-mountain-resort": "Jackson Creek Summit",
+ "howelsen-hill": {
+  "lat": 40.4825,
+  "lon": -106.8385,
+  "baseFt": 6696,
+  "summitFt": 7136,
+  "url": "https://steamboatsprings.net/131/Howelsen-Hill-Ski-Area"
+ },
+ "searchmont-resort": {
+  "lat": 46.7647,
+  "lon": -84.049,
+  "baseFt": 889,
+  "summitFt": 1591,
+  "url": "https://www.searchmont.com"
+ },
+ "massif-du-sud": "Station  touristique du Massif du Sud",
+ "homewood-mountain-resort": "Homewood Ski Area",
+ "catamount-ski-ride-area": {
+  "id": "catamount"
+ }
+}

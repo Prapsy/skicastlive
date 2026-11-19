@@ -3,29 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>SkiCastLive · New England ski mountains, live</title>
-  <meta name="description" content="Every New England ski mountain on one map: what's open, lifts running, recent and forecast snowfall." />
-  <meta name="theme-color" content="#f5f9ff" />
+  <title>SkiCastLive · North America ski mountains, live</title>
+  <meta name="description" content="Every ski mountain in the US and Canada on one globe: what's open right now, lifts and runs, snow, ski maps." />
+  <meta name="theme-color" content="#081a38" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 4 30 28H2z' fill='%231d5fd1'/%3E%3Cpath d='M16 4l5 8.6-2.6-1.4L16 14l-2.4-2.8L11 12.6z' fill='%23fff'/%3E%3C/svg%3E" />
 </head>
 <body>
   <div id="app">
     <header class="top">
-      <a class="brand" href="#" id="home" aria-label="SkiCastLive, back to full map">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 30 28H2z" fill="#1d5fd1"/><path d="M16 4l5 8.6-2.6-1.4L16 14l-2.4-2.8L11 12.6z" fill="#fff"/></svg>
+      <a class="brand" href="#" id="home" aria-label="SkiCastLive, back to the full globe">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 30 28H2z" fill="#5ab4ff"/><path d="M16 4l5 8.6-2.6-1.4L16 14l-2.4-2.8L11 12.6z" fill="#fff"/></svg>
         <span>SkiCast<b>Live</b></span>
       </a>
+      <div class="live" id="live" aria-live="polite">Loading mountains…</div>
       <div class="search">
-        <input id="q" type="search" placeholder="Search a mountain or state…" autocomplete="off" aria-label="Search mountains" />
+        <input id="q" type="search" placeholder="Search a mountain, state or province…" autocomplete="off" aria-label="Search mountains" />
         <ul id="results" role="listbox" hidden></ul>
       </div>
-      <button id="openOnly" class="chip" aria-pressed="false"><i></i><span>Open now</span></button>
+      <button id="units" class="units" type="button"></button>
     </header>
     <main>
-      <svg id="map" role="img" aria-label="Map of New England ski mountains"></svg>
+      <canvas id="globe" aria-hidden="true"></canvas>
+      <svg id="map" role="img" aria-label="Globe of North American ski mountains"></svg>
+      <aside id="rail" aria-label="Choose a ski region"></aside>
       <div class="legend" id="legend"></div>
-      <div class="status" id="status">Loading mountains…</div>
       <aside id="panel" hidden aria-live="polite"></aside>
+      <p class="credit">Status from each resort and <a href="https://www.onthesnow.com/skireport" target="_blank" rel="noopener">OnTheSnow</a> · forecast by <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> · maps © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
     </main>
   </div>
   <script type="module" src="/src/main.ts"></script>
