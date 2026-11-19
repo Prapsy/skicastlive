@@ -1,14 +1,14 @@
 {
  "groups": [
-  { "id": "northeast", "name": "Northeast", "blurb": "New England & New York" },
-  { "id": "southeast", "name": "Mid-Atlantic & Southeast", "blurb": "Pennsylvania to the Smokies" },
-  { "id": "midwest", "name": "Midwest", "blurb": "Great Lakes & the Plains" },
-  { "id": "rockies", "name": "Rockies", "blurb": "Colorado, Utah & the Mountain West" },
-  { "id": "pnw", "name": "Pacific Northwest", "blurb": "Washington & Oregon" },
-  { "id": "california", "name": "California & Tahoe", "blurb": "The Sierra & Southern California" },
-  { "id": "alaska", "name": "Alaska", "blurb": "The Last Frontier" },
-  { "id": "canada-west", "name": "Western Canada", "blurb": "British Columbia & Alberta" },
-  { "id": "canada-east", "name": "Eastern Canada", "blurb": "Ontario & Quebec" }
+  { "id": "northeast", "name": "Northeast", "blurb": "New England & New York", "label": [-61.5, 40.2] },
+  { "id": "southeast", "name": "Mid-Atlantic & Southeast", "blurb": "Pennsylvania to the Smokies", "label": [-71.5, 28.5] },
+  { "id": "midwest", "name": "Midwest", "blurb": "Great Lakes & the Plains", "label": [-91.5, 51.5] },
+  { "id": "rockies", "name": "Rockies", "blurb": "Colorado, Utah & the Mountain West", "label": [-107.5, 29.0] },
+  { "id": "pnw", "name": "Pacific Northwest", "blurb": "Washington & Oregon", "label": [-131.5, 45.5] },
+  { "id": "california", "name": "California & Tahoe", "blurb": "The Sierra & Southern California", "label": [-128.0, 34.5] },
+  { "id": "alaska", "name": "Alaska", "blurb": "The Last Frontier", "label": [-153.0, 56.0] },
+  { "id": "canada-west", "name": "Western Canada", "blurb": "British Columbia & Alberta", "label": [-124.0, 59.5] },
+  { "id": "canada-east", "name": "Eastern Canada", "blurb": "Ontario & Quebec", "label": [-73.5, 53.5] }
  ],
  "regions": [
   { "code": "ME", "name": "Maine", "country": "US", "group": "northeast", "ots": "maine" },

@@ -13,7 +13,7 @@ const rail = $<HTMLElement>('#rail'), panelEl = $<HTMLElement>('#panel');
 // Part of the globe area covered by the rail and the panel, so the globe centres itself in what is left.
 function insets() {
   const main = $<HTMLElement>('main').getBoundingClientRect();
-  if (isWide()) return { left: rail.getBoundingClientRect().right - main.left, right: panelEl.hidden ? 0 : main.right - panelEl.getBoundingClientRect().left, top: 0, bottom: 0 };
+  if (isWide()) return { left: (rail.getBoundingClientRect().right - main.left) * 0.9, right: panelEl.hidden ? 0 : main.right - panelEl.getBoundingClientRect().left, top: 0, bottom: 0 };
   const sheet = panelEl.hidden ? rail : panelEl;
   return { left: 0, right: 0, top: 0, bottom: Math.max(0, main.bottom - sheet.getBoundingClientRect().top) };
 }
@@ -59,7 +59,7 @@ function search() {
   hits = mountains.filter(m => score(m) < 9).sort((a, b) => score(a) - score(b) || Number(b.season.status === 'open') - Number(a.season.status === 'open') || vert(b) - vert(a)).slice(0, 8);
   cursor = 0;
   results.innerHTML = hits.length
-    ? hits.map((m, i) => `<li role="option" data-i="${i}" class="${i === 0 ? 'on' : ''}"><i class="dot s-${m.season.status}"></i><span>${esc(m.name)}</span><em>${m.state} · ${esc(statusWord(m))}</em></li>`).join('')
+    ? hits.map((m, i) => `<li role="option" data-i="${i}" class="${i === 0 ? 'on' : ''}"><i class="dot s-${m.season.status}"></i><span>${esc(m.name)}</span><em>${m.state}, ${esc(statusWord(m)).toLowerCase()}</em></li>`).join('')
     : `<li class="none">No mountain matches “${esc(q.value)}”</li>`;
   results.hidden = false;
 }
@@ -80,16 +80,16 @@ document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && document
 
 // ---------------------------------------------------------------- top bar
 const units = $<HTMLButtonElement>('#units');
-function renderUnits() { units.textContent = isMetric() ? '°C · cm' : '°F · in'; units.setAttribute('aria-label', `Units: ${isMetric() ? 'metric' : 'imperial'}. Switch.`); }
+function renderUnits() { units.textContent = isMetric() ? '°C, cm' : '°F, in'; units.setAttribute('aria-label', `Units: ${isMetric() ? 'metric' : 'imperial'}. Switch.`); }
 units.addEventListener('click', () => { setMetric(!isMetric()); renderUnits(); renderLive(); picker.render(); mountainPanel.refresh(); });
 $<HTMLAnchorElement>('#home').addEventListener('click', ev => { ev.preventDefault(); if (selected) closePanel(); else globe.home(); });
 
 function renderLive() {
   const open = mountains.filter(m => m.season.status === 'open').length;
   const leaders = mountains.filter(m => (m.resortSnow?.last72In ?? 0) > 0).sort((a, b) => b.resortSnow!.last72In! - a.resortSnow!.last72In!).slice(0, 3);
-  $<HTMLElement>('#live').innerHTML = `<span class="count"><i class="${open ? 'on' : ''}"></i><b>${open}</b> open in North America</span>
-    <span class="upd">updated ${ago(generatedAt)}</span>
-    ${leaders.length ? `<span class="leaders"><em>Most snow, 3 days</em>${leaders.map(m => `<button data-m="${m.id}">${esc(m.name)} <b>${snow(m.resortSnow!.last72In!)}</b></button>`).join('')}</span>` : ''}`;
+  $<HTMLElement>('#live').innerHTML = `<span class="count"><i class="${open ? 'on' : ''}"></i><b>${open}</b><span>open<span class="where"> in North America</span></span></span>
+    <span class="upd">Updated ${ago(generatedAt)}</span>
+    ${leaders.length ? `<span class="leaders"><em>Most snow in 3 days</em>${leaders.map(m => `<button data-m="${m.id}">${esc(m.name)} <b>${snow(m.resortSnow!.last72In!)}</b></button>`).join('')}</span>` : ''}`;
   const closed = mountains.filter(m => m.season.status === 'closed').length;
   $<HTMLElement>('#legend').innerHTML = `<span><i class="k s-open"></i>Open <b>${open}</b></span><span><i class="k s-closed"></i>Closed <b>${closed}</b></span><span><i class="k s-unknown"></i>See resort site <b>${mountains.length - open - closed}</b></span>`;
 }
@@ -112,7 +112,7 @@ async function load(first = false) {
   }
 }
 
-globe.init({ insets, onPick: m => pick(m), onBackground: closePanel });
+globe.init({ insets, onPick: m => pick(m), onBackground: closePanel, onRegion: g => picker.select(g) });
 mountainPanel.init({ onClose: closePanel });
 picker.init({ onPick: m => pick(m), onScope: () => { if (selected) closePanel(); else showScope(); } });
 renderUnits();

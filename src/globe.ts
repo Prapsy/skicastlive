@@ -3,7 +3,7 @@ import { geoOrthographic, geoPath, geoGraticule10, geoCentroid, geoDistance } fr
 import { select } from 'd3-selection';
 import { zoom as d3zoom, zoomIdentity, type ZoomTransform } from 'd3-zoom';
 import geoJson from './geo.json';
-import { type Mountain, vert, statusWord, regionName } from './types';
+import { type Mountain, GROUPS, vert, statusWord, regionName } from './types';
 
 const geo = geoJson as unknown as { land: GeoJSON.MultiPolygon; states: GeoJSON.FeatureCollection<GeoJSON.Geometry, { code: string; name: string; country: string }> };
 const stateLabels = geo.states.features.map(f => ({ code: f.properties.code, at: geoCentroid(f) as [number, number] }));
@@ -13,6 +13,7 @@ const sphere: GeoJSON.GeoJsonObject = { type: 'Sphere' } as unknown as GeoJSON.G
 const canvas = document.querySelector<HTMLCanvasElement>('#globe')!;
 const ctx = canvas.getContext('2d')!;
 const svg = select<SVGSVGElement, unknown>('#map');
+const calloutG = svg.append('g').attr('class', 'callouts');
 const markG = svg.append('g').attr('class', 'marks');
 const projection = geoOrthographic().clipAngle(90).precision(0.4);
 const path = geoPath(projection, ctx);
@@ -33,6 +34,8 @@ let onReady: (() => void) | null = null;
 let insets = () => ({ left: 0, right: 0, top: 0, bottom: 0 });
 let onPick: (m: Mountain) => void = () => {};
 let onBackground: () => void = () => {};
+let onRegion: (group: string) => void = () => {};
+let callouts: { id: string; name: string; open: number; total: number; at: [number, number]; label: [number, number] }[] = [];
 
 const clampLat = (v: number) => Math.max(-88, Math.min(88, v));
 const free = () => { const i = insets(); return { cx: i.left + (w - i.left - i.right) / 2, cy: i.top + (h - i.top - i.bottom) / 2, fw: Math.max(120, w - i.left - i.right), fh: Math.max(120, h - i.top - i.bottom) }; };
@@ -56,9 +59,10 @@ const syncZoom = () => { lastT = zoomIdentity.translate(lastT.x, lastT.y).scale(
 
 function schedule() { if (sized && !frame) frame = requestAnimationFrame(() => { frame = 0; draw(); }); }
 
-const markerSize = (m: Mountain) => 6 + Math.min(9, vert(m) / 330);
-/** How big markers are drawn at the current zoom: small dots from far away, full glyphs up close. */
-const markerScale = () => Math.max(0.36, Math.min(w < 600 ? 0.72 : 1.1, 0.26 + k * 0.05));
+/** Triangle size follows vertical drop on a square-root curve: a 4,000 ft mountain is about twice a 300 ft hill, never huge. */
+const markerSize = (m: Mountain) => 5 + 6.5 * Math.sqrt(Math.min(Math.max(vert(m), 0), 4400) / 4400);
+/** How big markers are drawn at the current zoom: small from far away, full glyphs up close. */
+const markerScale = () => Math.max(0.46, Math.min(w < 600 ? 0.8 : 1.05, 0.34 + k * 0.045));
 
 function draw() {
   const f = free();
@@ -82,10 +86,11 @@ function draw() {
   if (k >= 2.4) {
     const centre: [number, number] = [-rot[0], -rot[1]];
     ctx.fillStyle = `rgba(205,225,255,${k > 14 ? 0.16 : 0.34})`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.font = `800 ${Math.min(30, 9 + k * 1.3)}px ui-sans-serif, system-ui, sans-serif`;
+    ctx.font = `600 ${Math.min(34, 10 + k * 1.4)}px "Barlow Condensed", ui-sans-serif, system-ui, sans-serif`;
     for (const s of stateLabels) { if (geoDistance(centre, s.at) > 1.2) continue; const p = projection(s.at); if (p) ctx.fillText(s.code, p[0], p[1]); }
   }
   placeMarkers();
+  placeCallouts();
 }
 
 function placeMarkers() {
@@ -123,6 +128,53 @@ function placeMarkers() {
     g.select('.in').attr('transform', `scale(${(fs * (open ? 1.25 : 1)).toFixed(3)})`);
     g.select('.lbl').attr('display', labelled.has(d.id) ? null : 'none').attr('y', markerSize(d) * 0.72 * fs * (open ? 1.25 : 1) + 14);
   });
+}
+
+/** Region names pinned beside the globe with a leader line to the region: the picker lives on the map itself. */
+function placeCallouts() {
+  const centre: [number, number] = [-rot[0], -rot[1]];
+  const show = !focusGroup && !selected && w >= 700 && k < 3.2;
+  calloutG.attr('display', show ? null : 'none');
+  if (!show) return;
+  calloutG.selectAll<SVGGElement, typeof callouts[number]>('g.callout').each(function (d) {
+    const g = select(this);
+    if (geoDistance(centre, d.label) > 1.45 || geoDistance(centre, d.at) > 1.45) { g.attr('display', 'none'); return; }
+    const a = projection(d.at)!, p = projection(d.label)!;
+    const wdt = Math.max(d.name.length * 9.5, 150);
+    // text runs away from the region, unless that would push it off the screen
+    const left = p[0] < a[0] ? p[0] - wdt > 8 : p[0] + wdt > w - 8;
+    const len = Math.hypot(p[0] - a[0], p[1] - a[1]) || 1, ux = (p[0] - a[0]) / len, uy = (p[1] - a[1]) / len;
+    g.attr('display', null).classed('left', left);
+    g.select('line').attr('x1', a[0] + ux * 16).attr('y1', a[1] + uy * 16).attr('x2', p[0] - ux * 6).attr('y2', p[1] - uy * 6);
+    g.select('circle').attr('cx', a[0] + ux * 16).attr('cy', a[1] + uy * 16);
+    g.select('.txt').attr('transform', `translate(${(p[0] + (left ? -4 : 4)).toFixed(1)},${p[1].toFixed(1)})`);
+    g.selectAll('text').attr('text-anchor', left ? 'end' : 'start');
+    g.select('rect').attr('x', left ? -wdt - 6 : -6).attr('y', -22).attr('width', wdt + 12).attr('height', 46);
+  });
+}
+
+function bindCallouts() {
+  callouts = GROUPS.map(g => {
+    const ms = mountains.filter(m => m.group === g.id);
+    let x = 0, y = 0, z = 0;
+    for (const m of ms) { const la = m.lat * Math.PI / 180, lo = m.lon * Math.PI / 180; x += Math.cos(la) * Math.cos(lo); y += Math.cos(la) * Math.sin(lo); z += Math.sin(la); }
+    return { id: g.id, name: g.name, open: ms.filter(m => m.season.status === 'open').length, total: ms.length, label: g.label,
+      at: [Math.atan2(y, x) * 180 / Math.PI, Math.atan2(z, Math.hypot(x, y)) * 180 / Math.PI] as [number, number] };
+  }).filter(c => c.total);
+  const sel = calloutG.selectAll<SVGGElement, typeof callouts[number]>('g.callout').data(callouts, d => d.id).join(enter => {
+    const g = enter.append('g').attr('class', 'callout').attr('tabindex', 0).attr('role', 'button');
+    g.append('line'); g.append('circle').attr('r', 2.5);
+    const t = g.append('g').attr('class', 'txt');
+    t.append('rect').attr('rx', 8);
+    t.append('text').attr('class', 'cname');
+    t.append('text').attr('class', 'ccount').attr('y', 17);
+    g.on('click', (ev, d) => { ev.stopPropagation(); onRegion(d.id); })
+      .on('keydown', (ev, d) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); onRegion(d.id); } });
+    return g;
+  });
+  sel.attr('aria-label', d => `${d.name}: ${d.open} of ${d.total} mountains open. Show this region.`).classed('has-open', d => d.open > 0);
+  sel.select('.cname').text(d => d.name);
+  sel.select('.ccount').text(d => (d.open ? `${d.open} open of ${d.total}` : `${d.total} mountains, none open yet`));
 }
 
 function bindMarkers() {
@@ -173,8 +225,8 @@ function flyTo(target: [number, number], toK: number, ms = 1300) {
 const fitK = (radius: number) => { const f = free(); return 0.44 * Math.min(f.fw, f.fh) / (r0 * Math.sin(Math.min(1.4, Math.max(0.012, radius)))); };
 
 export const globe = {
-  init(opts: { insets: typeof insets; onPick: typeof onPick; onBackground: typeof onBackground }) {
-    insets = opts.insets; onPick = opts.onPick; onBackground = opts.onBackground;
+  init(opts: { insets: typeof insets; onPick: typeof onPick; onBackground: typeof onBackground; onRegion: typeof onRegion }) {
+    insets = opts.insets; onPick = opts.onPick; onBackground = opts.onBackground; onRegion = opts.onRegion;
     let t = 0;
     new ResizeObserver(() => { clearTimeout(t); t = window.setTimeout(() => this.resize(), sized ? 120 : 0); }).observe(canvas.parentElement!);
     this.resize();
@@ -191,7 +243,7 @@ export const globe = {
   },
   /** Run once the globe has a size (the page may load in a hidden tab). */
   whenReady(fn: () => void) { if (sized) fn(); else onReady = fn; },
-  setMountains(ms: Mountain[]) { mountains = ms; bindMarkers(); schedule(); },
+  setMountains(ms: Mountain[]) { mountains = ms; bindMarkers(); bindCallouts(); schedule(); },
   setSelected(m: Mountain | null) { selected = m; schedule(); },
   setFocus(group: string | null) { focusGroup = group; schedule(); },
   redraw: schedule,

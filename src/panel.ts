@@ -11,11 +11,11 @@ let tab: Tab = 'report';
 let onClose: () => void = () => {};
 const terrainCache = new Map<string, Promise<Terrain | null>>();
 const host = (u: string) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return 'resort site'; } };
-const link = (href: string | null | undefined, label: string, cls = 'btn') => href ? `<a class="${cls}" href="${esc(href)}" target="_blank" rel="noopener">${esc(label)} ↗</a>` : '';
+const link = (href: string | null | undefined, label: string, cls = 'btn') => href ? `<a class="${cls}" href="${esc(href)}" target="_blank" rel="noopener">${esc(label)}</a>` : '';
 
 function sourceLine(m: Mountain) {
   if (m.coverage === 'live') return `Lift status read from ${esc(m.name)}’s own report ${ago(m.liftsUpdated)}.`;
-  if (m.coverage === 'report') return `Reported by ${esc(m.name)} via <a href="${esc(m.otsUrl)}" target="_blank" rel="noopener">OnTheSnow ↗</a>, updated ${ago(m.liftsUpdated)}.`;
+  if (m.coverage === 'report') return `Reported by ${esc(m.name)} via <a href="${esc(m.otsUrl)}" target="_blank" rel="noopener">OnTheSnow</a>, updated ${ago(m.liftsUpdated)}.`;
   return esc(m.sourceNote ?? 'Live status for this mountain is on the official site.');
 }
 
@@ -97,7 +97,7 @@ function weatherTab(m: Mountain) {
         <div><b>${snow(w.past72In)}</b><span>last 3 days</span></div><div><b>${snow(w.next24In)}</b><span>today</span></div>
         <div><b>${snow(w.next72In)}</b><span>next 3 days</span></div><div><b>${snow(w.next7dIn)}</b><span>next 7 days</span></div>
       </div>
-      ${measured.length && (m.season.status === 'open' || depthIn(m) != null) ? `<p class="resortsnow"><b>Reported by ${esc(m.name)}:</b> ${measured.join(' · ')}</p>` : ''}
+      ${measured.length && (m.season.status === 'open' || depthIn(m) != null) ? `<p class="resortsnow"><b>Reported by ${esc(m.name)}:</b> ${measured.join(', ')}</p>` : ''}
       ${w.now ? `<p class="now">Now at ${elev(w.elevationFt)}: <b>${temp(w.now.tempF)}${tempUnit().slice(1)}</b>, ${esc(w.now.summary.toLowerCase())}, wind ${wind(w.now.windMph)}</p>` : ''}
     </section>
     <section class="card"><h3>7-day forecast</h3><ul class="days">${next.map(row).join('')}</ul></section>
@@ -166,13 +166,13 @@ async function drawSkiMap(m: Mountain) {
   const order = ['easy', 'inter', 'other', 'adv', 'exp'];
   const runs = [...t.runs].sort((a, b) => order.indexOf((DIFF[a.d] ?? DIFF.other)[0]) - order.indexOf((DIFF[b.d] ?? DIFF.other)[0]))
     .map(r => { const [cls, word] = DIFF[r.d] ?? DIFF.other; const pl = r.c.map(P).join(' ');
-      return `<g class="run r-${cls}" data-tip="${esc(`${r.n ?? 'Unnamed run'} · ${word}`)}"><polyline class="hit" points="${pl}"/><polyline points="${pl}"/></g>`; });
+      return `<g class="run r-${cls}" data-tip="${esc(`${r.n ?? 'Unnamed run'}, ${word.toLowerCase()}`)}"><polyline class="hit" points="${pl}"/><polyline points="${pl}"/></g>`; });
   const hasStatus = status.size > 0;
   const lifts = t.lifts.map(l => {
     const st = l.id != null ? status.get(l.id) : undefined;
     const name = st?.name ?? l.n ?? l.k.replace(/_/g, ' ');
     const a = P(l.c[0]).split(','), b = P(l.c[l.c.length - 1]).split(','), pl = l.c.map(P).join(' ');
-    return `<g class="lift d-${st ? st.status : 'none'}" data-tip="${esc(`${name} · lift${st ? ' · ' + st.status : ''}`)}"><polyline class="hit" points="${pl}"/><polyline class="case" points="${pl}"/><polyline points="${pl}"/>
+    return `<g class="lift d-${st ? st.status : 'none'}" data-tip="${esc(`${name}, lift${st ? ', ' + st.status : ''}`)}"><polyline class="hit" points="${pl}"/><polyline class="case" points="${pl}"/><polyline points="${pl}"/>
       <circle r="2.4" cx="${a[0]}" cy="${a[1]}"/><circle r="2.4" cx="${b[0]}" cy="${b[1]}"/></g>`;
   }).sort((a, b) => Number(a.includes('d-open')) - Number(b.includes('d-open')));
   const counts = new Map<string, number>();
@@ -180,7 +180,7 @@ async function drawSkiMap(m: Mountain) {
   const key = [['easy', 'Easiest'], ['inter', 'Intermediate'], ['adv', 'Advanced'], ['exp', 'Expert']].filter(([c]) => counts.get(c))
     .map(([c, wd]) => `<span class="k-run k-${c}">${wd} <b>${counts.get(c)}</b></span>`).join('');
   box.innerHTML = `<div class="mapwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Ski map of ${esc(m.name)}: ${t.runs.length} runs and ${t.lifts.length} lifts"><g class="vp">${runs.join('')}${lifts.join('')}</g></svg>
-      <span class="north" style="transform:rotate(${(-ang * 180 / Math.PI).toFixed(0)}deg)" title="North">↑<i>N</i></span>
+      <span class="north" title="North is this way"><i style="transform:rotate(${(-ang * 180 / Math.PI).toFixed(0)}deg)">↑</i>N</span>
       <button class="reset" type="button" hidden>Reset view</button></div>
     <div class="dtip">Tap a run or lift for its name. Pinch or scroll to zoom.</div>
     <div class="dkey">${key}</div>
@@ -209,7 +209,7 @@ function render(keepScroll = false) {
     <header>
       <span class="pill p-${m.season.status}">${esc(statusWord(m))}</span>
       <h2>${esc(m.name)}</h2>
-      <p class="meta">${esc(regionName(m.state))} · summit ${elev(m.summitFt)} · ${elev(vert(m))} vertical</p>
+      <p class="meta">${esc(regionName(m.state))}. Summit ${elev(m.summitFt)}, ${elev(vert(m))} of vertical.</p>
     </header>
     <nav class="tabs" role="tablist">${TABS.map(([id, label]) => `<button role="tab" aria-selected="${id === tab}" data-tab="${id}">${label}</button>`).join('')}</nav>
     <div class="tabbody">${body}</div>`;

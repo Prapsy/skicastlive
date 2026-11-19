@@ -23,10 +23,10 @@ export interface Terrain {
   lifts: { id: number | null; n: string | null; k: string; c: [number, number][]; e: [number, number] }[];
   runs: { n: string | null; d: string; c: [number, number][]; e: [number, number] }[];
 }
-export interface Group { id: string; name: string; blurb: string }
+export interface Group { id: string; name: string; blurb: string; label: [number, number] }
 export interface Region { code: string; name: string; country: string; group: string }
 
-export const GROUPS = regionsJson.groups as Group[];
+export const GROUPS = regionsJson.groups as unknown as Group[];
 export const REGIONS = regionsJson.regions as Region[];
 const regionByCode = new Map(REGIONS.map(r => [r.code, r]));
 export const regionName = (code: string) => regionByCode.get(code)?.name ?? code;
