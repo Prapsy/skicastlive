@@ -43,7 +43,7 @@ function showRegion(g: string, fly = true) {
   if (fly) globe.toMountains(mountainPanel.scope()); else globe.redraw();
 }
 
-function pick(m: Mountain, ms = 1400) {
+function pick(m: Mountain, ms = 1700) {
   const info = GROUPS.find(x => x.id === m.group);
   if (group !== m.group && info) { group = m.group; picker.setGroup(group); mountainPanel.showRegion(info, inGroup(m.group)); }
   selected = m;

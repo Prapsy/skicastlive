@@ -68,9 +68,13 @@ const nearestGroup = (maxRad: number) => { let best: string | null = null, bd = 
 // Wheel and pinch zoom glide instead of jumping: the handler only sets where the view should end up
 // (kGoal, rotGoal) and a per-frame ease carries the globe there. Dragging stays direct.
 let kGoal = k, rotGoal: [number, number] = [...rot], glide = 0, glideAt = 0;
+// Where a zoom-out started from. Pulling back travels along the line from here to the middle of North
+// America, a little with every notch, so the view drifts to the centre instead of turning at the end.
+let anchor: { rot: [number, number]; k: number } = { rot: [...rot], k };
+const setAnchor = () => { anchor = { rot: [...rotGoal], k: kGoal }; };
 function glideStep(now: number) {
   const dt = Math.min(64, now - glideAt); glideAt = now;
-  const fk = 1 - Math.exp(-dt / 110), fr = 1 - Math.exp(-dt / 300);
+  const fk = 1 - Math.exp(-dt / 190), fr = fk; // zoom and drift share one pace so they read as a single move
   k = Math.exp(Math.log(k) + (Math.log(kGoal) - Math.log(k)) * fk);
   const dLon = ((rotGoal[0] - rot[0] + 540) % 360) - 180, dLat = rotGoal[1] - rot[1];
   rot = [rot[0] + dLon * fr, rot[1] + dLat * fr];
@@ -88,9 +92,17 @@ const zoomer = d3zoom<SVGSVGElement, unknown>().scaleExtent([1, K_MAX]).on('zoom
     if (Math.abs(t.k - lastT.k) > 1e-9) {
       const out = t.k < lastT.k;
       if (!glide) rotGoal = [...rot];
-      kGoal = t.k;
-      // Fixed axis: zooming out towards the full view always settles facing North America.
-      if (out && kGoal < homeK * 1.6) rotGoal = [-HOME[0], -HOME[1]];
+      if (!out) { kGoal = t.k; setAnchor(); }
+      else {
+        if (kGoal > anchor.k) setAnchor();
+        kGoal = t.k;
+        // Fixed axis: how far out you are decides how far along the way home you are.
+        const span = Math.log(anchor.k / homeK);
+        const u = span > 0.05 ? Math.min(1, Math.max(0, Math.log(anchor.k / kGoal) / span)) : 1;
+        const e = u * u * (3 - 2 * u);
+        const dLon = ((-HOME[0] - anchor.rot[0] + 540) % 360) - 180;
+        rotGoal = [anchor.rot[0] + dLon * e, anchor.rot[1] + (-HOME[1] - anchor.rot[1]) * e];
+      }
       // Stepping through levels by zooming (one fast fling can cross two boundaries, so these are checked in turn).
       if (out && selected && kGoal < mountainK() * 0.42) cb.level('region');
       if (out && focusGroup && !selected && kGoal < Math.min(Math.max(homeK * 1.25, focusK * 0.62), homeK * 2)) cb.level('overview');
@@ -99,14 +111,14 @@ const zoomer = d3zoom<SVGSVGElement, unknown>().scaleExtent([1, K_MAX]).on('zoom
     } else {
       const deg = 180 / Math.PI / (r0 * k);
       rot = [rot[0] + (t.x - lastT.x) * deg, clampLat(rot[1] - (t.y - lastT.y) * deg)];
-      rotGoal = [...rot];
+      rotGoal = [...rot]; setAnchor();
       schedule();
     }
   }
   lastT = t;
 });
 svg.call(zoomer).on('dblclick.zoom', null);
-const syncZoom = () => { kGoal = k; rotGoal = [...rot]; lastT = zoomIdentity.translate(lastT.x, lastT.y).scale(k); svg.property('__zoom', lastT); };
+const syncZoom = () => { kGoal = k; rotGoal = [...rot]; setAnchor(); lastT = zoomIdentity.translate(lastT.x, lastT.y).scale(k); svg.property('__zoom', lastT); };
 
 /** Which region is under a screen point (overview only). */
 function groupAt(ev: MouseEvent): string | null {
@@ -138,7 +150,7 @@ let ccx = NaN, ccy = NaN;
 function draw() {
   const f = free();
   if (Number.isNaN(ccx) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { ccx = f.cx; ccy = f.cy; }
-  else if (Math.abs(f.cx - ccx) > 0.5 || Math.abs(f.cy - ccy) > 0.5) { ccx += (f.cx - ccx) * 0.14; ccy += (f.cy - ccy) * 0.14; schedule(); }
+  else if (Math.abs(f.cx - ccx) > 0.5 || Math.abs(f.cy - ccy) > 0.5) { ccx += (f.cx - ccx) * 0.09; ccy += (f.cy - ccy) * 0.09; schedule(); }
   else { ccx = f.cx; ccy = f.cy; }
   f.cx = ccx; f.cy = ccy;
   projection.scale(r0 * k).translate([f.cx, f.cy]).rotate([rot[0], rot[1]]);
@@ -309,7 +321,7 @@ function placeSoon() {
 }
 
 /** Animate the globe to look at a point at a zoom level. Long trips pull back a little on the way. */
-function flyTo(target: [number, number], toK: number, ms = 1300) {
+function flyTo(target: [number, number], toK: number, ms = 1500) {
   cancelAnimationFrame(anim); stopGlide();
   toK = Math.max(homeK, Math.min(K_MAX, toK));
   const from = [...rot] as [number, number], fromK = k;
@@ -319,7 +331,7 @@ function flyTo(target: [number, number], toK: number, ms = 1300) {
   if (!ms || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { rot = to; k = toK; syncZoom(); draw(); return; }
   const t0 = performance.now();
   const step = (now: number) => {
-    const t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 16 * t ** 5 : 1 - Math.pow(-2 * t + 2, 5) / 2;
     rot = [from[0] + dLon * e, from[1] + dLat * e];
     k = Math.max(homeK, Math.exp(Math.log(fromK) + (Math.log(toK) - Math.log(fromK)) * e) * (1 - hop * Math.sin(Math.PI * t)));
     syncZoom(); draw();
@@ -358,10 +370,10 @@ export const globe = {
   hoverRegion(group: string | null) { if (!focusGroup) { hoverGroup = group; schedule(); } },
   hoverMountain(id: string | null) { hoverId = id; schedule(); },
   redraw() { this.refit(); schedule(); },
-  home(ms = 1200) { this.refit(); flyTo(HOME, homeK, ms); },
-  toMountain(m: Mountain, ms = 1400) { this.refit(); flyTo([m.lon, m.lat], mountainK(), ms); },
+  home(ms = 1600) { this.refit(); flyTo(HOME, homeK, ms); },
+  toMountain(m: Mountain, ms = 1700) { this.refit(); flyTo([m.lon, m.lat], mountainK(), ms); },
   /** Frame a set of mountains (a region). */
-  toMountains(ms: Mountain[], dur = 1400) {
+  toMountains(ms: Mountain[], dur = 1700) {
     if (!ms.length) return;
     this.refit();
     let x = 0, y = 0, z = 0;

@@ -63,8 +63,8 @@ main { position: relative; flex: 1; min-height: 0; background: radial-gradient(1
 #map { touch-action: none; cursor: grab; }
 #map:active { cursor: grabbing; }
 #map.pointing { cursor: pointer; }
-.m { cursor: pointer; outline: none; transition: opacity .3s; }
-.m .tri { stroke-linejoin: round; stroke-width: 1.5; fill: rgba(196, 214, 240, .26); stroke: rgba(220, 232, 252, .62); }
+.m { cursor: pointer; outline: none; transition: opacity .6s ease; }
+.m .tri { transition: fill .6s ease, stroke .6s ease; stroke-linejoin: round; stroke-width: 1.5; fill: rgba(196, 214, 240, .26); stroke: rgba(220, 232, 252, .62); }
 .m .cap { fill: none; }
 .m .pulse { display: none; fill: none; stroke: var(--lamp); stroke-width: 1.6; pointer-events: none; }
 .m.s-open .tri { fill: var(--lamp); stroke: #fff; stroke-width: 1.8; filter: drop-shadow(0 0 6px rgba(255, 194, 77, .95)); }
@@ -119,12 +119,12 @@ main { position: relative; flex: 1; min-height: 0; background: radial-gradient(1
 .has-panel .credit { display: none; }
 
 /* ---------- left column: the question and the regions, set straight onto the sky ---------- */
-#rail { position: absolute; top: 0; left: 0; bottom: 0; width: 356px; overflow-y: auto; padding: 30px 56px 28px 28px; overscroll-behavior: contain; z-index: 3; scrollbar-width: thin; transition: opacity .4s;
+#rail { position: absolute; top: 0; left: 0; bottom: 0; width: 356px; overflow-y: auto; padding: 30px 56px 28px 28px; overscroll-behavior: contain; z-index: 3; scrollbar-width: thin; transition: opacity .6s ease;
   background: linear-gradient(90deg, rgba(6, 20, 43, .92) 0%, rgba(6, 20, 43, .78) 70%, rgba(6, 20, 43, 0) 100%); }
 #rail h1 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 44px; line-height: .98; color: #fff; text-wrap: balance; }
 .sub { margin: 12px 0 0; font-size: 15px; line-height: 1.45; color: var(--frost); max-width: 30ch; }
 .groups { list-style: none; margin: 22px 0 0; padding: 0; }
-.groups button { display: grid; grid-template-columns: 1fr auto; column-gap: 12px; align-items: baseline; width: 100%; padding: 11px 0 11px 14px; border: 0; border-top: 1px solid var(--rule); border-left: 3px solid transparent; background: none; text-align: left; transition: border-color .15s, background .15s, padding .15s; }
+.groups button { display: grid; grid-template-columns: 1fr auto; column-gap: 12px; align-items: baseline; width: 100%; padding: 11px 0 11px 14px; border: 0; border-top: 1px solid var(--rule); border-left: 3px solid transparent; background: none; text-align: left; transition: border-color .3s ease, background .3s ease; }
 .groups li:first-child button { border-top-color: transparent; }
 .groups button:hover, .groups button.hot { border-left-color: #fff; background: linear-gradient(90deg, rgba(160, 195, 245, .16), transparent); }
 .groups button[aria-current="true"] { border-left-color: var(--lamp); background: linear-gradient(90deg, rgba(255, 194, 77, .14), transparent); }
@@ -139,7 +139,7 @@ main { position: relative; flex: 1; min-height: 0; background: radial-gradient(1
 .states button[aria-pressed="true"] { color: #fff; border-color: var(--lamp); }
 
 /* ---------- mountain panel: the same night glass, full height on the right ---------- */
-#panel { position: absolute; top: 0; right: 0; bottom: 0; width: 412px; transition: width .65s cubic-bezier(.3, .75, .2, 1), background .4s; overflow-y: auto; background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-left: 1px solid var(--rule); padding: 24px 24px 28px; animation: in .4s cubic-bezier(.2, .8, .2, 1); overscroll-behavior: contain; z-index: 4; scrollbar-width: thin; }
+#panel { position: absolute; top: 0; right: 0; bottom: 0; width: 412px; transition: width .85s cubic-bezier(.22, 1, .36, 1), background .5s; overflow-y: auto; background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-left: 1px solid var(--rule); padding: 24px 24px 28px; animation: in .6s cubic-bezier(.22, 1, .36, 1); overscroll-behavior: contain; z-index: 4; scrollbar-width: thin; }
 @keyframes in { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
 #panel .close { position: sticky; top: 0; float: right; z-index: 2; width: 34px; height: 34px; border: 1px solid var(--rule); border-radius: 50%; background: var(--night); font-size: 20px; line-height: 1; color: var(--frost); }
 #panel .close:hover { color: #fff; border-color: var(--ice); }
@@ -228,9 +228,9 @@ blockquote cite { display: block; margin-top: 4px; font-style: normal; font-size
 .mlist .n em { font-style: normal; font-weight: 400; color: var(--frost); font-size: 12.5px; margin-left: 7px; }
 .mlist .v { font-size: 13.5px; color: var(--frost); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .mlist .v b { color: #fff; font-weight: 600; }
-.enter .mlist li, .enter .lh, .enter header { animation: rise .5s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 30ms + 120ms); }
+.enter .mlist li, .enter .lh, .enter header { animation: rise .7s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--i, 0) * 34ms + 140ms); }
 .enter header { animation-delay: 0ms; }
-@keyframes rise { from { transform: translateX(26px); opacity: 0; } }
+@keyframes rise { from { transform: translateX(18px); opacity: 0; } }
 
 /* full view: information on the left, the ski map on the right */
 .expand { display: block; width: 100%; margin: 0 0 12px; padding: 11px 14px; border: 1px solid var(--rule); border-radius: 8px; background: rgba(160, 195, 245, .08); text-align: left; font-weight: 600; font-size: 15px; color: #fff; }
@@ -242,9 +242,9 @@ blockquote cite { display: block; margin-top: 4px; font-style: normal; font-size
 .xbar .crumb { padding: 0; }
 #panel .xbar .close { position: static; float: none; }
 .xgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); height: calc(100% - 63px); }
-.xinfo { overflow-y: auto; padding: 24px 28px 40px; scrollbar-width: thin; animation: slideL .7s cubic-bezier(.2, .8, .2, 1) both; }
+.xinfo { overflow-y: auto; padding: 24px 28px 40px; scrollbar-width: thin; animation: slideL .9s cubic-bezier(.22, 1, .36, 1) both; }
 .xinfo > * { max-width: 560px; }
-.xmap { padding: 24px 28px; border-left: 1px solid var(--rule); overflow-y: auto; animation: slideR .7s cubic-bezier(.2, .8, .2, 1) .12s both; }
+.xmap { padding: 24px 28px; border-left: 1px solid var(--rule); overflow-y: auto; animation: slideR .9s cubic-bezier(.22, 1, .36, 1) .12s both; }
 @keyframes slideL { from { transform: translateX(-40px); opacity: 0; } }
 @keyframes slideR { from { transform: translateX(60px); opacity: 0; } }
 #panel.full header .crumb { display: none; }
